@@ -1,2 +1,2 @@
 # gnss-globe
-GNSS Globe Using Andriod Table Receiver
+GNSS Globe Using Andriod Tablet Receiver
