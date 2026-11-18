@@ -2,10 +2,6 @@
 
 An Android app that turns a tablet's own GNSS receiver into a live 3D view of the satellite constellations: where every satellite in view is, which ones your position fix is using, their orbits, signal strengths and names. Core features work fully offline, and the APK is built entirely from a web browser with GitHub Actions — no desktop or Android Studio needed.
 
-<!-- Screenshot: upload one to the repo (e.g. docs/screenshot.png) and uncomment the next line.
-![GNSS Globe on a Galaxy Tab S11](docs/screenshot.png)
--->
-
 ## Features
 
 - **3D globe (Cesium, offline)** — your position and a straight line to every satellite in view, coloured by constellation. Bold = used in the fix; solid line = computed orbit; dashed = direction only. **GPS III satellites are gold.**
