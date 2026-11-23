@@ -38,14 +38,16 @@ Kotlin reads the receiver, decodes broadcast navigation messages, stores orbit d
 
 | Priority | Source | Constellations | Accuracy | Kept until |
 | --- | --- | --- | --- | --- |
-| 1 | Broadcast ephemeris decoded on the tablet | GPS, QZSS, Galileo | ~1 m | toe + 4 h |
+| 1 | Broadcast ephemeris decoded on the tablet | GPS, QZSS, Galileo, BeiDou (MEO/IGSO), GLONASS | ~1 m (GLONASS: integrated, km-level after 2 h) | toe + 4 h (GLONASS tb + 2 h) |
 | 2 | GPS broadcast almanac decoded on the tablet | GPS | a few km | toa + 14 days |
 | 3 | CelesTrak element sets, propagated with SGP4 | all | ~1–few km | epoch + 14 days |
 | 4 | Nominal orbit height along the measured direction | anything else (e.g. SBAS) | direction only | — |
 
+Every decoded ephemeris is checked once against the direction the receiver itself reports; if they differ by more than 3° it isn't used and the next source takes over.
+
 CelesTrak names don't carry Android's satellite IDs, so each tracked satellite is paired with the element set whose predicted direction matches the measured azimuth/elevation (within 3°).
 
-The full algorithm write-up — frames and time, LNAV and Galileo I/NAV decoding, orbit propagation, orbit tracks, signal naming and verification — is in the **[wiki](../../wiki)**.
+The full algorithm write-up — frames and time, LNAV, Galileo I/NAV, BeiDou D1 and GLONASS decoding, orbit propagation, orbit tracks, signal naming and verification — is in the **[wiki](../../wiki)**.
 
 ## Install
 
@@ -95,7 +97,7 @@ Inside the zip:
 | Path | What it is |
 | --- | --- |
 | `app/src/main/java/.../MainActivity.kt` | GNSS callbacks, JSON to the page, settings bridge |
-| `app/src/main/java/.../NavDecoders.kt` | GPS/QZSS LNAV and Galileo I/NAV decoders (pure Kotlin) |
+| `app/src/main/java/.../NavDecoders.kt` | GPS/QZSS LNAV, Galileo I/NAV, BeiDou D1 and GLONASS decoders (pure Kotlin) |
 | `app/src/main/java/.../OrbitDb.kt` | SQLite orbit database and CelesTrak download |
 | `app/src/main/java/.../GpElements.kt` | Two-line element parsing |
 | `app/src/main/assets/web/index.html` | Globe, map, sky plot, signals, table, settings |
@@ -112,11 +114,13 @@ Inside the zip:
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors — 2D map tiles
 - Satellite catalog compiled from the [USCG NAVCEN GPS constellation status](https://navcen.uscg.gov/gps-constellation) and Wikipedia's GPS, Galileo and BeiDou satellite lists
 - [IS-GPS-200](https://www.gps.gov/technical/icwg/) — GPS navigation message and user algorithm
+- Galileo OS SIS ICD, BeiDou B1I SIS ICD and GLONASS ICD (edition 5.1) — the other navigation messages
+- Public Android GnssLogger recordings (2021) used to test the BeiDou, GLONASS and Galileo decoders
 
 ## Known limitations
 
-- BeiDou and GLONASS navigation messages aren't decoded on the device; those satellites use CelesTrak elements.
-- Galileo and QZSS decoding depends on the receiver passing those messages to apps.
+- BeiDou GEO satellites send D2 messages, which aren't decoded; they use CelesTrak elements.
+- Decoding depends on the receiver passing navigation messages to apps (check ⚙ → Orbit data).
 - GPS–UTC leap seconds are fixed at 18.
 - Cesium isn't pinned to a version, so a future major release could break a build.
 - Builds are signed with a debug key stored in this public repo — fine for personal sideloading, not for publishing.
