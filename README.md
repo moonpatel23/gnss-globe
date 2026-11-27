@@ -12,9 +12,16 @@ An Android app that turns a tablet's own GNSS receiver into a live 3D view of th
 - **Orbits for every constellation** — GPS, Galileo, GLONASS, BeiDou (MEO, IGSO and GEO), QZSS and NavIC, each drawn as one full orbit. A dashed ring marks the geostationary belt when SBAS satellites are in view.
 - **Sky plot** — azimuth/elevation polar view.
 - **Signals** — C/N0 bar for every signal, named from the receiver's raw codes (L1 C/A, L1C, E1, B1I, B1C, G1 …). ◎ marks satellites tracked on more than one signal.
-- **Satellites table** — PRN, SVN, long name (e.g. *GPS III SV01 "Vespucci"*), block, orbital slot, launch date, elevation/azimuth, signal, bands and the orbit source in use.
+- **Satellites table** — PRN, SVN, long name (e.g. *GPS III SV01 "Vespucci"*), block, orbital slot, launch date, elevation/azimuth, signal, bands and the orbit data decoded from the receiver.
+- **Receiver-only tabs** — Sky, Signals and Satellites show only what the tablet's receiver reports right now, so they work the same with no internet.
+- **Time slider on the Globe** — slide back up to 3 hours to see what the receiver actually recorded (in view, used, signal strength; kept on the tablet across restarts), or forward up to 6 hours for predicted satellite positions. Clouds, radar and lighting follow the same slider.
+- **Starts with a prediction** — before the receiver reports, the Globe shows predicted satellites at the last known position (stored only on the tablet).
 - **Local 2D map** — city-level view with ground speed in mph, heading, breadcrumb trail and zoom buttons.
-- **Live clouds** — NOAA GOES-East/West and JMA Himawari infrared (or GOES GeoColor) via NASA GIBS, refreshed every 10 minutes.
+- **Layers panel** (Globe tab) — map imagery, 3D terrain and 2D map style, plus online weather and warnings:
+  clouds (NOAA GOES / JMA Himawari via NASA GIBS), U.S. NEXRAD radar and HRRR forecast radar (Iowa Environmental Mesonet),
+  NWS warnings (api.weather.gov), naval navigational warnings (NGA, with Coast Guard data for U.S. waters as a fallback;
+  launch and debris hazard areas highlighted), hurricanes (NHC) and day/night shading. Tap a warning for its text.
+  For situational awareness only, not a flight or navigation briefing.
 - **High-resolution imagery and 3D terrain** — optional, with your own free Cesium ion token.
 - **On-device orbit database** — keeps only valid orbit data and deletes it as it expires, so orbits keep working on the road without internet.
 - **Self-updating satellite catalog** — names and PRN assignments come from `satdb.json` in this repo; edit it after a launch and the app picks it up, no rebuild.
@@ -76,11 +83,17 @@ Because the IDs differ, both apps can be installed side by side. The usual loop:
 
 To build locally instead: unzip the project, copy Cesium's `Build/Cesium` folder to `app/src/main/assets/cesium`, and open it in Android Studio.
 
+## Layers (Globe tab)
+
+- **Map** — globe imagery (Bing aerial, aerial with labels, road, or built-in offline), 3D terrain, 2D map style (road, aerial, aerial with labels, same as globe, OpenStreetMap).
+- **Weather** — clouds (infrared or GeoColor, wider coverage, opacity), radar, forecast radar.
+- **Warnings** — NWS, naval, hurricanes. **Lighting** — day/night shading.
+
+Online data goes through a small proxy inside the app (`WebProxy.kt`) that only reaches a fixed list of government sites and keeps the last copy of each warning feed for offline use.
+
 ## Settings (⚙)
 
 - **Cesium ion token** — paste your token from ion.cesium.com → Access Tokens for Bing imagery and optional Cesium World Terrain. Stored only on the device.
-- **2D map style** — road, aerial, aerial with labels, same as globe, or OpenStreetMap.
-- **Live clouds** — infrared or GeoColor, wider coverage, opacity.
 - **Orbit data** — counts, CelesTrak status, which navigation messages the receiver provides, and download/clear buttons.
 - **Satellite catalog** — which catalog version is in use and a manual update check.
 
@@ -100,7 +113,9 @@ Inside the zip:
 | `app/src/main/java/.../NavDecoders.kt` | GPS/QZSS LNAV, Galileo I/NAV, BeiDou D1 and GLONASS decoders (pure Kotlin) |
 | `app/src/main/java/.../OrbitDb.kt` | SQLite orbit database and CelesTrak download |
 | `app/src/main/java/.../GpElements.kt` | Two-line element parsing |
-| `app/src/main/assets/web/index.html` | Globe, map, sky plot, signals, table, settings |
+| `app/src/main/java/.../WebProxy.kt` | Same-origin proxy for the online layers, with offline copies |
+| `app/src/main/assets/web/index.html` | Globe, map, sky plot, signals, table, settings, receiver history |
+| `app/src/main/assets/web/weather.js` | Layers panel, time slider, weather and warning layers |
 | `app/src/main/assets/web/gnss.js` | GPS time, orbit propagation, signal naming |
 | `app/src/main/assets/web/satdb.js` | Built-in copy of the satellite catalog |
 | `app/src/main/assets/web/sgp4/` | satellite.js (SGP4) |
@@ -112,6 +127,8 @@ Inside the zip:
 - [CelesTrak](https://celestrak.org/NORAD/elements/) — GNSS orbital element sets
 - [NASA GIBS](https://gibs.earthdata.nasa.gov/) — GOES (NOAA) and Himawari (JMA) cloud imagery
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors — 2D map tiles
+- [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/) — NEXRAD and HRRR radar tiles
+- [NWS API](https://www.weather.gov/documentation/services-web-api), [NHC](https://www.nhc.noaa.gov/), [NGA MSI](https://msi.nga.mil/) and [USCG NAVCEN](https://www.navcen.uscg.gov/) — warnings
 - Satellite catalog compiled from the [USCG NAVCEN GPS constellation status](https://navcen.uscg.gov/gps-constellation) and Wikipedia's GPS, Galileo and BeiDou satellite lists
 - [IS-GPS-200](https://www.gps.gov/technical/icwg/) — GPS navigation message and user algorithm
 - Galileo OS SIS ICD, BeiDou B1I SIS ICD and GLONASS ICD (edition 5.1) — the other navigation messages
