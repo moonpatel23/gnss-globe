@@ -87,7 +87,8 @@ To build locally instead: unzip the project, copy Cesium's `Build/Cesium` folder
 
 - **Map** — globe imagery (Bing aerial, aerial with labels, road, or built-in offline), 3D terrain, 2D map style (road, aerial, aerial with labels, same as globe, OpenStreetMap).
 - **Weather** — clouds (infrared or GeoColor, wider coverage, opacity), radar, forecast radar.
-- **Warnings** — NWS, naval, hurricanes. **Lighting** — day/night shading.
+- **Warnings** — NWS, naval (Coast Guard fallback: launch/recovery only, plus safety zones, or everything), hurricanes. **Lighting** — day/night shading.
+- **Aviation** — FAA TFRs from the feeds behind tfr.faa.gov, coloured by type; tap one for effective times, altitudes and the NOTAM text. Not for flight planning.
 
 Online data goes through a small proxy inside the app (`WebProxy.kt`) that only reaches a fixed list of government sites and keeps the last copy of each warning feed for offline use.
 
@@ -129,6 +130,7 @@ Inside the zip:
 - [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors — 2D map tiles
 - [Iowa Environmental Mesonet](https://mesonet.agron.iastate.edu/) — NEXRAD and HRRR radar tiles
 - [NWS API](https://www.weather.gov/documentation/services-web-api), [NHC](https://www.nhc.noaa.gov/), [NGA MSI](https://msi.nga.mil/) and [USCG NAVCEN](https://www.navcen.uscg.gov/) — warnings
+- [FAA TFR website](https://tfr.faa.gov/) — temporary flight restrictions
 - Satellite catalog compiled from the [USCG NAVCEN GPS constellation status](https://navcen.uscg.gov/gps-constellation) and Wikipedia's GPS, Galileo and BeiDou satellite lists
 - [IS-GPS-200](https://www.gps.gov/technical/icwg/) — GPS navigation message and user algorithm
 - Galileo OS SIS ICD, BeiDou B1I SIS ICD and GLONASS ICD (edition 5.1) — the other navigation messages
